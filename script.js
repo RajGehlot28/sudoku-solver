@@ -1,190 +1,149 @@
-let arr = [[], [], [], [], [], [], [], [], []];
-let board = [[], [], [], [], [], [], [], [], []];
+let gridSize = 9;
+let puzzleBoard = [];
+let originalPuzzle = [];
 
-for (let i = 0; i < 9; i++) {
-    for (let j = 0; j < 9; j++) {
-        const id = i * 9 + j;
-        arr[i][j] = document.getElementById(id);
-        arr[i][j].contentEditable = true;
-        board[i][j] = 0;
+let gridContainer = document.getElementById('sudoku-grid');
+let getPuzzleBtn = document.getElementById('get-puzzle-btn');
+let solvePuzzleBtn = document.getElementById('solve-puzzle-btn');
+let validateBtn = document.getElementById('validate-btn');
+let clearBtn = document.getElementById('clear-btn');
+let messageBox = document.getElementById('message-box');
+
+// for initializing the board
+for(let i = 0; i < gridSize; i++) {
+    puzzleBoard[i] = [];
+    originalPuzzle[i] = [];
+    for(let j = 0; j < gridSize; j++) {
+        puzzleBoard[i][j] = 0;
+        originalPuzzle[i][j] = 0;
     }
 }
 
-const messageBox = document.getElementById('messageBox');
+function makeGrid() {
+    gridContainer.innerHTML = '';
+    for(let i = 0; i < 81; i++) {
+        let cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.setAttribute('contenteditable', true);
+        gridContainer.appendChild(cell);
+    }
+}
 
+// this prints the grid
+function showGrid() {
+    let cells = gridContainer.children;
+    for(let row = 0; row < gridSize; row++) {
+        for(let col = 0; col < gridSize; col++) {
+            let cellIndex = row * gridSize + col;
+            let cell = cells[cellIndex];
+            let value = puzzleBoard[row][col];
+
+            if(value === 0) { // if there is empty cell -> print 0
+                cell.textContent = '';
+                cell.classList.remove('pre-filled');
+                cell.setAttribute('contenteditable', true);
+            }
+            else {
+                cell.textContent = value;
+                
+                if(originalPuzzle[row][col] !== 0) { // if this is from originalPizzle -> non-editable
+                    cell.classList.add('pre-filled');
+                    cell.setAttribute('contenteditable', false);
+                }
+                else { // it is from editable section -> user can hack the numbers here
+                    cell.classList.remove('pre-filled');
+                    cell.setAttribute('contenteditable', true);
+                }
+            }
+        }
+    }
+}
+
+// this function updates user input on puzzleBoard array
+function readGridFromScreen() {
+    let cells = gridContainer.children;
+    for (let i = 0; i < cells.length; i++) {
+        let row = Math.floor(i / gridSize);
+        let col = i % gridSize;
+        let value = cells[i].textContent.trim();
+        // taking the value if and only if it is a number
+        if(value >= '1' && value <= '9') {
+            puzzleBoard[row][col] = parseInt(value);
+        }
+        else { // else the cell remains empty
+            puzzleBoard[row][col] = 0;
+        }
+    }
+}
+
+// this function prints the messages in message box
 function showMessage(text, type) {
-    messageBox.innerText = text;
-    messageBox.className = 'message-box ' + type;
+    messageBox.textContent = text;
+    messageBox.className = type + ' visible';
+
+    // and remove the message after 3 second
     setTimeout(function() {
-        messageBox.innerText = '';
-        messageBox.className = 'message-box';
+        messageBox.classList.remove('visible');
     }, 3000);
 }
 
-function fillBoard() {
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            const val = board[i][j];
-            arr[i][j].innerText = val !== 0 ? val : '';
-        }
-    }
-}
-
-function readBoard() {
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            const text = arr[i][j].innerText;
-            const num = parseInt(text);
-            board[i][j] = isNaN(num) ? 0 : num;
-        }
-    }
-}
-
-function hasInvalidInput() {
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            const val = board[i][j];
-            if (val < 0 || val > 9) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-function isBoardEmpty() {
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            if (board[i][j] !== 0) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-function isBoardComplete() {
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            if (board[i][j] === 0) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-const getBtn = document.getElementById('GetPuzzle');
-const solveBtn = document.getElementById('SolvePuzzle');
-const validateBtn = document.getElementById('Validate');
-const clearBtn = document.getElementById('Clear');
-
-getBtn.onclick = function() {
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-        const response = JSON.parse(xhr.response);
-        board = response.board;
-        fillBoard();
-        showMessage('Puzzle loaded successfully!', 'success');
-    };
-    xhr.onerror = function() {
-        showMessage('Failed to load puzzle. Please try again.', 'error');
-    };
-    xhr.open('GET', 'https://sugoku.onrender.com/board?difficulty=easy');
-    xhr.send();
-};
-
-solveBtn.onclick = function() {
-    readBoard();
-    
-    if (isBoardEmpty()) {
-        showMessage('Board is empty! Please get a puzzle or enter numbers.', 'error');
-        return;
-    }
-    
-    if (hasInvalidInput()) {
-        showMessage('Invalid input! Please enter numbers between 1-9 only.', 'error');
-        return;
-    }
-    
-    if (!isBoardValid()) {
-        showMessage('Board has conflicts! Cannot solve.', 'error');
-        return;
-    }
-    
-    if (solveSudoku(0, 0)) {
-        fillBoard();
-        showMessage('Puzzle solved successfully!', 'success');
-    } else {
-        showMessage('No solution exists for this puzzle.', 'error');
-    }
-};
-
-validateBtn.onclick = function() {
-    readBoard();
-    
-    if (isBoardEmpty()) {
-        showMessage('Board is empty! Please enter some numbers.', 'error');
-        return;
-    }
-    
-    if (hasInvalidInput()) {
-        showMessage('Invalid input! Please enter numbers between 1-9 only.', 'error');
-        return;
-    }
-    
-    if (!isBoardComplete()) {
-        showMessage('Board is incomplete! Please fill all cells.', 'error');
-        return;
-    }
-    
-    if (isBoardValid()) {
-        showMessage('Board is valid! No conflicts found.', 'success');
-        highlightCells('green');
-    } else {
-        showMessage('Board has conflicts! Please check your entries.', 'error');
-        highlightCells('red');
-    }
-};
-
-clearBtn.onclick = function() {
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            board[i][j] = 0;
-        }
-    }
-    fillBoard();
-    showMessage('Board cleared!', 'info');
-};
-
-function isBoardValid() {
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            const num = board[i][j];
-            if (num !== 0) {
-                board[i][j] = 0;
-                if (!isSafe(i, j, num)) {
-                    board[i][j] = num;
-                    return false;
+// this function fetches data(sudoku) from api and update our puzzleBoard and originalBoard according to the board
+function getPuzzle() {
+    fetch('https://sugoku.onrender.com/board?difficulty=easy')
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            // board loaded -> update puzzleBoard and originalPuzzle
+            puzzleBoard = data.board;
+            for(let i = 0; i < gridSize; i++) {
+                originalPuzzle[i] = [];
+                for(let j = 0; j < gridSize; j++) {
+                    originalPuzzle[i][j] = data.board[i][j];
                 }
-                board[i][j] = num;
             }
-        }
-    }
-    return true;
+            showGrid();
+            showMessage('New puzzle loaded!', 'success');
+        })
+        .catch(function(error) { // error message if the board couldn't loaded
+            showMessage('could not fetch a new puzzle. Try again.', 'error');
+        });
 }
 
-function isSafe(row, col, num) {
-    for (let i = 0; i < 9; i++) {
-        if (board[row][i] === num || board[i][col] === num) {
+// this function clears the board by changing all values to 0 and print a message
+function clearBoard() {
+    for(let i = 0; i < gridSize; i++) {
+        for(let j = 0; j < gridSize; j++) {
+            puzzleBoard[i][j] = 0;
+            originalPuzzle[i][j] = 0;
+        }
+    }
+    showGrid();
+    showMessage('Board cleared.', 'info');
+}
+
+// this function is used to check whether a number is valid or not
+function isNumberValid(board, row, col, num) {
+    // checking for each column
+    for(let i = 0; i < gridSize; i++) {
+        if(board[row][i] === num) {
             return false;
         }
     }
-    const startRow = Math.floor(row / 3) * 3;
-    const startCol = Math.floor(col / 3) * 3;
-    for (let r = startRow; r < startRow + 3; r++) {
-        for (let c = startCol; c < startCol + 3; c++) {
-            if (board[r][c] === num) {
+    
+    // checking for rows
+    for(let i = 0; i < gridSize; i++) {
+        if(board[i][col] === num) {
+            return false;
+        }
+    }
+    
+    // checking for the subgrid if this don't have the num
+    let boxStartRow = row - row%3;
+    let boxStartCol = col - col%3;
+    for(let r = 0; r < 3; r++) {
+        for(let c = 0; c < 3; c++) {
+            if(board[boxStartRow + r][boxStartCol + c] === num) {
                 return false;
             }
         }
@@ -192,39 +151,168 @@ function isSafe(row, col, num) {
     return true;
 }
 
-function solveSudoku(row, col) {
-    if (row === 9) {
-        return true;
-    }
-    if (col === 9) {
-        return solveSudoku(row + 1, 0);
-    }
-    if (board[row][col] !== 0) {
-        return solveSudoku(row, col + 1);
-    }
-    for (let num = 1; num <= 9; num++) {
-        if (isSafe(row, col, num)) {
-            board[row][col] = num;
-            if (solveSudoku(row, col + 1)) {
-                return true;
+// it is finding empty cell where value has to be filled
+function findEmptyCell(board) {
+    for(let r = 0; r < gridSize; r++) {
+        for(let c = 0; c < gridSize; c++) {
+            if(board[r][c] === 0) {
+                return [r, c];
             }
-            board[row][col] = 0;
         }
     }
+    return null;
+}
+
+// this function solves the sudoku by self
+function solveSudoku() {
+    let emptyCell = findEmptyCell(puzzleBoard);
+    // if there are no empty cell left -> sudoku completed
+    if(emptyCell === null) {
+        return true;
+    }
+    let row = emptyCell[0];
+    let col = emptyCell[1];
+
+    // trying each number from 1 to 9 for that empty cell
+    for(let num = 1; num <= 9; num++) {
+        // checking if the number is valid to insert
+        if(isNumberValid(puzzleBoard, row, col, num)) {
+            puzzleBoard[row][col] = num;
+            //  going for recursive call with this number for board[row][col]
+            if(solveSudoku()) {
+                return true;
+            }
+            // backtracking, if no solution found with this number -> try to insert another number at that place
+            puzzleBoard[row][col] = 0;
+        }
+    }
+    // returning false if no matches found for the sudoku
     return false;
 }
 
-function highlightCells(color) {
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            arr[i][j].style.borderColor = color;
-        }
-    }
-    setTimeout(function() {
-        for (let i = 0; i < 9; i++) {
-            for (let j = 0; j < 9; j++) {
-                arr[i][j].style.borderColor = '';
+// this function first check for user input, if this is correct -> there is no conflict and then solves it
+function clickSolveButton() {
+    readGridFromScreen();
+    
+    // checking for each user input number if it is valid or not
+    let boardIsGood = true;
+    for(let r = 0; r < gridSize; r++) {
+        for(let c = 0; c < gridSize; c++) {
+            let num = puzzleBoard[r][c];
+            if(num !== 0) {
+                // we are changing value to 0 first because in our isNumberValid we checks the current position also
+                // so replace that element to 0 and then check for its validity
+                puzzleBoard[r][c] = 0;
+                if(!isNumberValid(puzzleBoard, r, c, num)) { // wrong number is placed by user
+                    boardIsGood = false;
+                }
+                // again place the value of that element
+                puzzleBoard[r][c] = num;
             }
         }
-    }, 1000);
+    }
+    
+    // mistake found in sudoku
+    if(!boardIsGood) {
+        showMessage('Current board has mistakes. Cannot solve.', 'error');
+        return;
+    }
+
+    // sudoku is correct(no conflicts) so solve it
+    if(solveSudoku()) {
+        showGrid();
+        showMessage('Puzzle solved!', 'success');
+    }
+    else { // by chance if the sudoku can't be solve then print that no solution exist
+        showMessage('No solution exists for this puzzle.', 'error');
+    }
 }
+
+// this function checks if the board is valid or not
+function clickValidateButton() {
+    readGridFromScreen();
+    
+    // first it checks if there is an empty cell exist or not
+    let emptyCell = findEmptyCell(puzzleBoard);
+    if(emptyCell !== null) {
+        // empty cell exist -> first complete the board
+        showMessage('Board is not complete!', 'info');
+        return;
+    }
+    
+    // checking if the solution is valid or not
+    let boardIsCorrect = true;
+    for(let r = 0; r < gridSize; r++) {
+        for(let c = 0; c < gridSize; c++) {
+            let num = puzzleBoard[r][c];
+            // again make the value to zero(due to function - isNumberValid()) and check for the row, col and subgrid
+            puzzleBoard[r][c] = 0;
+            if(!isNumberValid(puzzleBoard, r, c, num)) {
+                boardIsCorrect = false;
+            }
+            puzzleBoard[r][c] = num;
+        }
+    }
+    
+    // sudoku is valid
+    if(boardIsCorrect) {
+        showMessage('Congratulations! The solution is valid.', 'success');
+    }
+    else {
+        showMessage('There are mistakes in your solution.', 'error');
+    }
+}
+
+// connecting all the buttons with their functions
+getPuzzleBtn.addEventListener('click', function() {
+    getPuzzle();
+});
+
+solvePuzzleBtn.addEventListener('click', function() {
+    clickSolveButton();
+});
+
+validateBtn.addEventListener('click', function() {
+    clickValidateButton();
+});
+
+clearBtn.addEventListener('click', function() {
+    clearBoard();
+});
+
+// this functions are used to valid input -> the input can only be number
+gridContainer.addEventListener('keydown', function(e) {
+    let cell = e.target;
+    // it ensures that user has typed on cell only not any other place
+    if(!cell.classList.contains('cell')) {
+        // not typed on cell so return
+        return;
+    }
+
+    let isNumber = e.key >= '1' && e.key <= '9';
+    let isBackspace = e.key === 'Backspace';
+    let isDelete = e.key === 'Delete';
+
+    // if the key press is not a number, backspace or delete don't take actions for that    
+    if(!isNumber && !isBackspace && !isDelete) {
+        e.preventDefault();
+    }
+});
+
+gridContainer.addEventListener('input', function(e) {
+    let cell = e.target;
+    // it ensures that user has typed on cell only
+    if(!cell.classList.contains('cell')) {
+        // not typed on cell so return
+        return;
+    }
+    
+    // if the number is more than one digit number then consider only the first digit
+    if(cell.textContent.length > 1) {
+        cell.textContent = cell.textContent.slice(0, 1);
+    }
+});
+
+// creates sudoku grid and print when the page is loaded
+makeGrid();
+showGrid();
