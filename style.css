@@ -1,118 +1,205 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-  margin: 20px;
-  text-align: center;
-  color: #333;
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 16px;
 }
 
-.Heading {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #333;
+.container {
+    width: 100%;
+    max-width: 448px;
+    margin: 0 auto;
 }
 
-.sudoku_grid {
-  display: grid;
-  grid-template-columns: repeat(9, 45px);
-  grid-template-rows: repeat(9, 45px);
-  gap: 2px;
-  justify-content: center;
-  margin: 0 auto 20px auto;
+header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.subtitle {
+    color: #6b7280;
+    margin-top: 8px;
+}
+
+.sudoku-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px solid #374151;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: white;
 }
 
 .cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  background-color: #fff;
-  border: 1px solid #666;
-  cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 500;
+    border: 1px solid #d1d5db;
+    cursor: pointer;
+    background-color: white;
+    transition: background-color 0.2s;
+    outline: none;
 }
 
 .cell:hover {
-  background-color: #e8f4f8;
+    background-color: #dbeafe;
 }
 
-.Buttons {
-  margin: 20px 0;
+.cell:focus {
+    background-color: #dbeafe;
+}
+
+.cell.pre-filled {
+    color: #374151;
+    font-weight: 600;
+    background-color: #f9fafb;
+}
+
+.cell.pre-filled:hover {
+    background-color: #f9fafb;
+}
+
+.sudoku-grid .cell:nth-child(3n) {
+    border-right-width: 3px;
+}
+
+.sudoku-grid .cell:nth-child(9n) {
+    border-right-width: 1px;
+}
+
+.sudoku-grid > div:nth-child(n+19):nth-child(-n+27),
+.sudoku-grid > div:nth-child(n+46):nth-child(-n+54) {
+    border-bottom-width: 3px;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 24px;
+}
+
+@media (min-width: 640px) {
+    .button-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 button {
-  background-color: #4CAF50;
-  color: white;
-  border: 2px solid #333;
-  padding: 10px 20px;
-  margin: 5px;
-  font-size: 14px;
-  cursor: pointer;
-  font-weight: bold;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    color: white;
 }
 
 button:hover {
-  background-color: #45a049;
+    transform: scale(1.05);
 }
 
-button:active {
-  background-color: #3d8b40;
+button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
 }
 
-#GetPuzzle {
-  background-color: #2196F3;
+#get-puzzle-btn {
+    background-color: #3b82f6;
 }
 
-#GetPuzzle:hover {
-  background-color: #0b7dda;
+#get-puzzle-btn:hover {
+    background-color: #2563eb;
 }
 
-#SolvePuzzle {
-  background-color: #FF9800;
+#get-puzzle-btn:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.75);
 }
 
-#SolvePuzzle:hover {
-  background-color: #e68900;
+#solve-puzzle-btn {
+    background-color: #22c55e;
 }
 
-#Clear {
-  background-color: #f44336;
+#solve-puzzle-btn:hover {
+    background-color: #16a34a;
 }
 
-#Clear:hover {
-  background-color: #da190b;
+#solve-puzzle-btn:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.75);
 }
 
-.message-box {
-  min-height: 40px;
-  margin: 20px auto;
-  padding: 12px;
-  max-width: 500px;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 5px;
-  transition: all 0.3s ease;
+#validate-btn {
+    background-color: #eab308;
 }
 
-.message-box.success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 2px solid #28a745;
+#validate-btn:hover {
+    background-color: #ca8a04;
 }
 
-.message-box.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 2px solid #f44336;
+#validate-btn:focus {
+    box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.75);
 }
 
-.message-box.info {
-  background-color: #d1ecf1;
-  color: #0c5460;
-  border: 2px solid #17a2b8;
+#clear-btn {
+    background-color: #ef4444;
 }
 
-.message-box.empty {
-  border: 2px dashed #ccc;
-  color: #999;
+#clear-btn:hover {
+    background-color: #dc2626;
+}
+
+#clear-btn:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.75);
+}
+
+#message-box {
+    margin-top: 16px;
+    min-height: 48px;
+    padding: 12px;
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: opacity 0.3s;
+    opacity: 0;
+}
+
+#message-box.visible {
+    opacity: 1;
+}
+
+#message-box.success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+#message-box.error {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+#message-box.info {
+    background-color: #dbeafe;
+    color: #1e40af;
 }
