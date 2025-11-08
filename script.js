@@ -259,7 +259,7 @@ function clickValidateButton() {
         showMessage('Congratulations! The solution is valid.', 'success');
     }
     else {
-        showMessage('There are mistakes in your solution.', 'error');
+        showMessage('The solution is not valid.', 'error');
     }
 }
 
@@ -316,3 +316,4 @@ gridContainer.addEventListener('input', function(e) {
 // creates sudoku grid and print when the page is loaded
 makeGrid();
 showGrid();
+
