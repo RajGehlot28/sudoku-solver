@@ -90,23 +90,25 @@ function showMessage(text, type) {
 // this function fetches data(sudoku) from api and update our puzzleBoard and originalBoard according to the board
 function getPuzzle() {
     fetch('https://sugoku.onrender.com/board?difficulty=easy')
-        .then(function(response) {
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('API Error');
+            }
             return response.json();
         })
-        .then(function(data) {
+        .then(data => {
             // board loaded -> update puzzleBoard and originalPuzzle
-            puzzleBoard = data.board;
-            for(let i = 0; i < gridSize; i++) {
-                originalPuzzle[i] = [];
-                for(let j = 0; j < gridSize; j++) {
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    puzzleBoard[i][j] = data.board[i][j];
                     originalPuzzle[i][j] = data.board[i][j];
                 }
             }
             showGrid();
             showMessage('New puzzle loaded!', 'success');
         })
-        .catch(function(error) { // error message if the board couldn't loaded
-            showMessage('could not fetch a new puzzle. Try again.', 'error');
+        .catch(() => {
+            showMessage('Could not fetch puzzle. Try again.', 'error');
         });
 }
 
@@ -316,4 +318,5 @@ gridContainer.addEventListener('input', function(e) {
 // creates sudoku grid and print when the page is loaded
 makeGrid();
 showGrid();
+
 
