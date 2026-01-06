@@ -1,52 +1,71 @@
+🧩 Sudoku Solver
 
-Sudoku Solver
-A clean, interactive web-based Sudoku application that allows users to fetch new puzzles from an API, solve them manually, validate their progress, or solve them instantly using a backtracking algorithm.
+A clean and interactive web-based Sudoku application that lets users fetch new puzzles, solve them manually, validate their solution, or instantly solve the board using a backtracking algorithm.
 
 🚀 Features
-Fetch Puzzle: Pulls "Easy" difficulty puzzles from an external API (Sugoku).
 
-Manual Play: Edit empty cells directly with built-in input validation (1-9 only).
+Fetch Puzzle
+Load an Easy difficulty Sudoku puzzle from the Sugoku API.
 
-Auto-Solve: Uses a backtracking algorithm to find a solution instantly.
+Manual Play
+Fill empty cells directly with input validation (1–9 only).
 
-Validation: Checks if your completed board follows all Sudoku rules.
+Auto Solve
+Instantly solves the puzzle using a DFS backtracking algorithm.
 
-Visual Styling: Bold borders for 3×3 subgrids and distinct styling for pre-filled vs. user-filled cells.
+Validation
+Checks whether the completed board follows all Sudoku rules.
 
-Responsive Design: Mobile-friendly layout using CSS Grid and Flexbox.
+Visual Styling
+
+Bold borders for 3×3 subgrids
+
+Clear distinction between pre-filled and user-filled cells
+
+Responsive Design
+Works smoothly on both desktop and mobile devices.
 
 🛠️ Technology Stack
-HTML5: Semantic structure.
 
-CSS3: Modern styling with Inter font, Grid, and Hover effects.
+HTML5 – Semantic structure
 
-JavaScript (Vanilla): DOM manipulation, Fetch API, and Recursive Backtracking.
+CSS3 – Grid layout, Flexbox, Inter font, and hover effects
+
+JavaScript (Vanilla) – DOM manipulation, Fetch API, and recursive backtracking
 
 📂 Project Structure
-index.html: The main structure and UI elements.
-
-style.css: All layout rules, including the 9×9 grid and button themes.
-
-script.js: Logic for puzzle management, validation, and the solving algorithm.
+├── index.html   # Main UI and structure
+├── style.css    # Styling for grid, buttons, and layout
+└── script.js    # Puzzle logic, validation, and solver
 
 🧩 How to Use
-Get Puzzle: Click to load a new board. Pre-filled numbers will be locked.
 
-Play: Click on any empty cell and type a number from 1 to 9.
+Get Puzzle – Fetches a new Sudoku board (pre-filled cells are locked).
 
-Validate: Once the grid is full, click to see if your solution is correct.
+Play – Click an empty cell and enter a number from 1 to 9.
 
-Solve It: Stuck? Click this to let the algorithm finish the board for you.
+Validate – Checks whether your filled board is a valid solution.
 
-Clear: Resets the entire grid to empty.
+Solve It – Automatically completes the puzzle using the solver.
+
+Clear – Resets the board to an empty state.
 
 💡 Algorithm Details
-The auto-solver uses a Depth-First Search (DFS) backtracking approach. It:
 
-Searches for the next empty cell.
+The auto-solver uses a Depth-First Search (DFS) backtracking approach:
 
-Tries numbers 1–9 sequentially.
+Finds the next empty cell
 
-Checks validity against the current row, column, and 3×3 subgrid.
+Tries numbers from 1 to 9
 
-Recursively moves to the next cell or backtracks if a conflict is found.
+Checks validity for:
+
+Current row
+
+Current column
+
+Current 3×3 subgrid
+
+Recursively proceeds or backtracks on conflict
+
+This guarantees a correct solution if one exists.
