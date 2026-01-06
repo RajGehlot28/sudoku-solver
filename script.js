@@ -62,7 +62,7 @@ function showGrid() {
 // this function updates user input on puzzleBoard array
 function readGridFromScreen() {
     let cells = gridContainer.children;
-    for (let i = 0; i < cells.length; i++) {
+    for(let i = 0; i < cells.length; i++) {
         let row = Math.floor(i/gridSize);
         let col = i%gridSize;
         let value = cells[i].textContent.trim();
@@ -98,8 +98,8 @@ function getPuzzle() {
         })
         .then(data => {
             // board loaded -> update puzzleBoard and originalPuzzle
-            for (let i = 0; i < gridSize; i++) {
-                for (let j = 0; j < gridSize; j++) {
+            for(let i = 0; i < gridSize; i++) {
+                for(let j = 0; j < gridSize; j++) {
                     puzzleBoard[i][j] = data.board[i][j];
                     originalPuzzle[i][j] = data.board[i][j];
                 }
@@ -123,10 +123,11 @@ function getPuzzle() {
                 if(!isApiBoardValid) break;
             }
 
-            if (!isApiBoardValid) {
+            if(!isApiBoardValid) {
                 showMessage('API returned an invalid puzzle!', 'error');
                 clearBoard(); // Reset everything if the API data is bad
-            } else {
+            }
+            else {
                 if(validateBtn) { // check if valid button is rendered then show grid
                     showGrid();
                 }
