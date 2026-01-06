@@ -35,13 +35,12 @@ A clean and interactive web-based Sudoku application that lets users fetch new p
 
 ---
 
-## 📂 Project Structure
----
-├── index.html   # Main UI and structure
-├── style.css    # Styling for grid, buttons, and layout
-└── script.js    # Puzzle logic, validation, and solver
----
-
+📂 Project Structure
+  ```
+  ├── index.html   # Main UI and structure
+  ├── style.css    # Styling for grid, buttons, and layout
+  └── script.js    # Puzzle logic, validation, and solver
+  ```
 
 ## 🧩 How to Use
 
