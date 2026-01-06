@@ -63,8 +63,8 @@ function showGrid() {
 function readGridFromScreen() {
     let cells = gridContainer.children;
     for (let i = 0; i < cells.length; i++) {
-        let row = Math.floor(i / gridSize);
-        let col = i % gridSize;
+        let row = Math.floor(i/gridSize);
+        let col = i%gridSize;
         let value = cells[i].textContent.trim();
         // taking the value if and only if it is a number
         if(value >= '1' && value <= '9') {
@@ -154,20 +154,35 @@ function isNumberValid(board, row, col, num) {
 }
 
 // it is finding empty cell where value has to be filled
-function findEmptyCell(board) {
+function getBestEmptyCell(board) {
+    // returning MRV(minimum remaining values) cell -> cell with minimum choices left
+    let bestChoice = null;
+    let minChoice = 10;
     for(let r = 0; r < gridSize; r++) {
         for(let c = 0; c < gridSize; c++) {
-            if(board[r][c] === 0) {
-                return [r, c];
+            if(board[r][c] == 0) {
+                // return minimum choices cell such that tree would have less child at beginning
+                let choices = 0;
+                for(let num = 1; num <= 9; num++) {
+                    if(isNumberValid(board, r, c, num)) choices++;
+                }
+                if(choices < minChoice) {
+                    minChoice = choices;
+                    bestChoice = [r, c];
+                }
+                if(choices == 1) {
+                    return [r, c];
+                }
             }
         }
     }
-    return null;
+    return bestChoice;
 }
 
 // this function solves the sudoku by self
 function solveSudoku() {
-    let emptyCell = findEmptyCell(puzzleBoard);
+    // providing the cell with less choices of numbers
+    let emptyCell = getBestEmptyCell(puzzleBoard);
     // if there are no empty cell left -> sudoku completed
     if(emptyCell === null) {
         return true;
@@ -235,11 +250,11 @@ function clickValidateButton() {
     readGridFromScreen();
     
     // first it checks if there is an empty cell exist or not
-    let emptyCell = findEmptyCell(puzzleBoard);
+    let emptyCell = getBestEmptyCell(puzzleBoard);
     if(emptyCell !== null) {
         // empty cell exist -> first complete the board
         showMessage('Board is not complete!', 'info');
-        return;
+        return ;
     }
     
     // checking if the solution is valid or not
@@ -261,7 +276,7 @@ function clickValidateButton() {
         showMessage('Congratulations! The solution is valid.', 'success');
     }
     else {
-        showMessage('The solution is not valid.', 'error');
+        showMessage('Solution is not valid.', 'error');
     }
 }
 
@@ -318,5 +333,3 @@ gridContainer.addEventListener('input', function(e) {
 // creates sudoku grid and print when the page is loaded
 makeGrid();
 showGrid();
-
-
