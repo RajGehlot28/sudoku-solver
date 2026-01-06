@@ -104,8 +104,34 @@ function getPuzzle() {
                     originalPuzzle[i][j] = data.board[i][j];
                 }
             }
-            showGrid();
-            showMessage('New puzzle loaded!', 'success');
+
+            // checking whether sudoku from API is valid or not
+            let isApiBoardValid = true;
+            for(let r = 0; r < gridSize; r++) {
+                for(let c = 0; c < gridSize; c++) {
+                    let num = puzzleBoard[r][c];
+                    if(num !== 0) {
+                        // Temporarily empty the cell to check if 'num' is valid at this spot
+                        puzzleBoard[r][c] = 0;
+                        if(!isNumberValid(puzzleBoard, r, c, num)) {
+                            isApiBoardValid = false;
+                        }
+                        puzzleBoard[r][c] = num; // Restore the value
+                    }
+                    if(!isApiBoardValid) break;
+                }
+                if(!isApiBoardValid) break;
+            }
+
+            if (!isApiBoardValid) {
+                showMessage('API returned an invalid puzzle!', 'error');
+                clearBoard(); // Reset everything if the API data is bad
+            } else {
+                if(validateBtn) { // check if valid button is rendered then show grid
+                    showGrid();
+                }
+                showMessage('New puzzle loaded!', 'success');
+            }
         })
         .catch(() => {
             showMessage('Could not fetch puzzle. Try again.', 'error');
