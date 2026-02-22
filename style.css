@@ -79,10 +79,18 @@ button {
     color: white;
 }
 
-#get-puzzle-btn { background-color: #3b82f6; }
-#solve-puzzle-btn { background-color: #22c55e; }
-#validate-btn { background-color: #eab308; }
-#clear-btn { background-color: #ef4444; }
+#get-puzzle-btn { 
+    background-color: #3b82f6;
+}
+#solve-puzzle-btn { 
+    background-color: #22c55e; 
+}
+#validate-btn { 
+    background-color: #eab308;
+}
+#clear-btn {
+    background-color: #ef4444;
+}
 
 button:hover {
     opacity: 0.9;
@@ -101,9 +109,15 @@ button:hover {
     opacity: 1;
 }
 
-.success { background: #dcfce7; color: #166534; }
-.error { background: #fee2e2; color: #991b1b; }
-.info { background: #dbeafe; color: #1e40af; }
+.success {
+    background: #dcfce7; color: #166534;
+}
+.error {
+    background: #fee2e2; color: #991b1b;
+}
+.info {
+    background: #dbeafe; color: #1e40af;
+}
 
 .loader-overlay {
     position: fixed;
@@ -141,5 +155,8 @@ button:hover {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to { 
+        transform: rotate(360deg);
+    }
 }
+
