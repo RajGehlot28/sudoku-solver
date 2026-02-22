@@ -11,13 +11,14 @@ let messageBox = document.getElementById('message-box');
 let loaderOverlay = document.getElementById('loader-overlay');
 let loaderText = document.getElementById('loader-text');
 
-// Initialize board
-for(let i = 0; i < gridSize; i++) {
-    puzzleBoard[i] = [];
-    originalPuzzle[i] = [];
-    for(let j = 0; j < gridSize; j++) {
-        puzzleBoard[i][j] = 0;
-        originalPuzzle[i][j] = 0;
+function initBoards() {
+    for (let i = 0; i < gridSize; i++) {
+        puzzleBoard[i] = [];
+        originalPuzzle[i] = [];
+        for (let j = 0; j < gridSize; j++) {
+            puzzleBoard[i][j] = 0;
+            originalPuzzle[i][j] = 0;
+        }
     }
 }
 
@@ -41,7 +42,7 @@ function toggleButtons(disabled) {
 
 function makeGrid() {
     gridContainer.innerHTML = '';
-    for(let i = 0; i < 81; i++) {
+    for (let i = 0; i < 81; i++) {
         let cell = document.createElement('div');
         cell.classList.add('cell');
         cell.setAttribute('contenteditable', true);
@@ -51,19 +52,22 @@ function makeGrid() {
 
 function showGrid() {
     let cells = gridContainer.children;
-    for(let row = 0; row < gridSize; row++) {
-        for(let col = 0; col < gridSize; col++) {
+
+    for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+
             let cellIndex = row * gridSize + col;
             let cell = cells[cellIndex];
             let value = puzzleBoard[row][col];
 
-            if(value === 0) {
+            if (value === 0) {
                 cell.textContent = '';
                 cell.classList.remove('pre-filled');
                 cell.setAttribute('contenteditable', true);
             } else {
                 cell.textContent = value;
-                if(originalPuzzle[row][col] !== 0) {
+
+                if (originalPuzzle[row][col] !== 0) {
                     cell.classList.add('pre-filled');
                     cell.setAttribute('contenteditable', false);
                 } else {
@@ -77,11 +81,13 @@ function showGrid() {
 
 function readGridFromScreen() {
     let cells = gridContainer.children;
-    for(let i = 0; i < cells.length; i++) {
-        let row = Math.floor(i/gridSize);
-        let col = i%gridSize;
+
+    for (let i = 0; i < cells.length; i++) {
+        let row = Math.floor(i / gridSize);
+        let col = i % gridSize;
         let value = cells[i].textContent.trim();
-        if(value >= '1' && value <= '9') {
+
+        if (value >= '1' && value <= '9') {
             puzzleBoard[row][col] = parseInt(value);
         } else {
             puzzleBoard[row][col] = 0;
@@ -92,6 +98,7 @@ function readGridFromScreen() {
 function showMessage(text, type) {
     messageBox.textContent = text;
     messageBox.className = type + ' visible';
+
     setTimeout(() => {
         messageBox.classList.remove('visible');
     }, 3000);
@@ -102,21 +109,22 @@ function getPuzzle() {
 
     fetch('https://sugoku.onrender.com/board?difficulty=easy')
         .then(response => {
-            if (!response.ok) throw new Error('API Error');
+            if (!response.ok) throw new Error('API error');
             return response.json();
         })
         .then(data => {
-            for(let i = 0; i < gridSize; i++) {
-                for(let j = 0; j < gridSize; j++) {
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
                     puzzleBoard[i][j] = data.board[i][j];
                     originalPuzzle[i][j] = data.board[i][j];
                 }
             }
+
             showGrid();
-            showMessage('New puzzle loaded!', 'success');
+            showMessage("New puzzle loaded!", "success");
         })
         .catch(() => {
-            showMessage('Could not fetch puzzle. Try again.', 'error');
+            showMessage("Could not fetch puzzle. Try again.", "error");
         })
         .finally(() => {
             hideLoader();
@@ -124,18 +132,14 @@ function getPuzzle() {
 }
 
 function clearBoard() {
-    for(let i = 0; i < gridSize; i++) {
-        for(let j = 0; j < gridSize; j++) {
-            puzzleBoard[i][j] = 0;
-            originalPuzzle[i][j] = 0;
-        }
-    }
+    initBoards();
     showGrid();
-    showMessage('Board cleared.', 'info');
+    showMessage("Board cleared.", "info");
 }
 
 getPuzzleBtn.addEventListener('click', getPuzzle);
 clearBtn.addEventListener('click', clearBoard);
 
+initBoards();
 makeGrid();
 showGrid();
