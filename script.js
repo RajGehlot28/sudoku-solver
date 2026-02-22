@@ -9,40 +9,28 @@ let validateBtn = document.getElementById('validate-btn');
 let clearBtn = document.getElementById('clear-btn');
 let messageBox = document.getElementById('message-box');
 let loaderOverlay = document.getElementById('loader-overlay');
-let loaderText = document.getElementById('loader-text');
 
-function initBoards() {
-    for (let i = 0; i < gridSize; i++) {
-        puzzleBoard[i] = [];
-        originalPuzzle[i] = [];
-        for (let j = 0; j < gridSize; j++) {
-            puzzleBoard[i][j] = 0;
-            originalPuzzle[i][j] = 0;
-        }
-    }
-}
-
-function showLoader(text = "Loading Sudoku...") {
-    loaderText.textContent = text;
+function showLoader() {
     loaderOverlay.classList.add('active');
-    toggleButtons(true);
 }
 
 function hideLoader() {
     loaderOverlay.classList.remove('active');
-    toggleButtons(false);
 }
 
-function toggleButtons(disabled) {
-    getPuzzleBtn.disabled = disabled;
-    solvePuzzleBtn.disabled = disabled;
-    validateBtn.disabled = disabled;
-    clearBtn.disabled = disabled;
+// for initializing the board
+for(let i = 0; i < gridSize; i++) {
+    puzzleBoard[i] = [];
+    originalPuzzle[i] = [];
+    for(let j = 0; j < gridSize; j++) {
+        puzzleBoard[i][j] = 0;
+        originalPuzzle[i][j] = 0;
+    }
 }
 
 function makeGrid() {
     gridContainer.innerHTML = '';
-    for (let i = 0; i < 81; i++) {
+    for(let i = 0; i < 81; i++) {
         let cell = document.createElement('div');
         cell.classList.add('cell');
         cell.setAttribute('contenteditable', true);
@@ -50,27 +38,28 @@ function makeGrid() {
     }
 }
 
+// this prints the grid
 function showGrid() {
     let cells = gridContainer.children;
-
-    for (let row = 0; row < gridSize; row++) {
-        for (let col = 0; col < gridSize; col++) {
-
+    for(let row = 0; row < gridSize; row++) {
+        for(let col = 0; col < gridSize; col++) {
             let cellIndex = row * gridSize + col;
             let cell = cells[cellIndex];
             let value = puzzleBoard[row][col];
 
-            if (value === 0) {
+            if(value === 0) {
                 cell.textContent = '';
                 cell.classList.remove('pre-filled');
                 cell.setAttribute('contenteditable', true);
-            } else {
+            }
+            else {
                 cell.textContent = value;
-
-                if (originalPuzzle[row][col] !== 0) {
+                
+                if(originalPuzzle[row][col] !== 0) {
                     cell.classList.add('pre-filled');
                     cell.setAttribute('contenteditable', false);
-                } else {
+                }
+                else {
                     cell.classList.remove('pre-filled');
                     cell.setAttribute('contenteditable', true);
                 }
@@ -81,15 +70,14 @@ function showGrid() {
 
 function readGridFromScreen() {
     let cells = gridContainer.children;
-
-    for (let i = 0; i < cells.length; i++) {
-        let row = Math.floor(i / gridSize);
-        let col = i % gridSize;
+    for(let i = 0; i < cells.length; i++) {
+        let row = Math.floor(i/gridSize);
+        let col = i%gridSize;
         let value = cells[i].textContent.trim();
-
-        if (value >= '1' && value <= '9') {
+        if(value >= '1' && value <= '9') {
             puzzleBoard[row][col] = parseInt(value);
-        } else {
+        }
+        else {
             puzzleBoard[row][col] = 0;
         }
     }
@@ -98,33 +86,57 @@ function readGridFromScreen() {
 function showMessage(text, type) {
     messageBox.textContent = text;
     messageBox.className = type + ' visible';
-
-    setTimeout(() => {
+    setTimeout(function() {
         messageBox.classList.remove('visible');
     }, 3000);
 }
 
 function getPuzzle() {
-    showLoader("Fetching Sudoku from server...");
-
+    showLoader();
     fetch('https://sugoku.onrender.com/board?difficulty=easy')
         .then(response => {
-            if (!response.ok) throw new Error('API error');
+            if (!response.ok) {
+                throw new Error('API Error');
+            }
             return response.json();
         })
         .then(data => {
-            for (let i = 0; i < gridSize; i++) {
-                for (let j = 0; j < gridSize; j++) {
+            for(let i = 0; i < gridSize; i++) {
+                for(let j = 0; j < gridSize; j++) {
                     puzzleBoard[i][j] = data.board[i][j];
                     originalPuzzle[i][j] = data.board[i][j];
                 }
             }
 
-            showGrid();
-            showMessage("New puzzle loaded!", "success");
+            let isApiBoardValid = true;
+            for(let r = 0; r < gridSize; r++) {
+                for(let c = 0; c < gridSize; c++) {
+                    let num = puzzleBoard[r][c];
+                    if(num !== 0) {
+                        puzzleBoard[r][c] = 0;
+                        if(!isNumberValid(puzzleBoard, r, c, num)) {
+                            isApiBoardValid = false;
+                        }
+                        puzzleBoard[r][c] = num;
+                    }
+                    if(!isApiBoardValid) break;
+                }
+                if(!isApiBoardValid) break;
+            }
+
+            if(!isApiBoardValid) {
+                showMessage('API returned an invalid puzzle!', 'error');
+                clearBoard();
+            }
+            else {
+                if(validateBtn) {
+                    showGrid();
+                }
+                showMessage('New puzzle loaded!', 'success');
+            }
         })
         .catch(() => {
-            showMessage("Could not fetch puzzle. Try again.", "error");
+            showMessage('Could not fetch puzzle. Try again.', 'error');
         })
         .finally(() => {
             hideLoader();
@@ -132,14 +144,173 @@ function getPuzzle() {
 }
 
 function clearBoard() {
-    initBoards();
+    for(let i = 0; i < gridSize; i++) {
+        for(let j = 0; j < gridSize; j++) {
+            puzzleBoard[i][j] = 0;
+            originalPuzzle[i][j] = 0;
+        }
+    }
     showGrid();
-    showMessage("Board cleared.", "info");
+    showMessage('Board cleared.', 'info');
 }
 
-getPuzzleBtn.addEventListener('click', getPuzzle);
-clearBtn.addEventListener('click', clearBoard);
+function isNumberValid(board, row, col, num) {
+    for(let i = 0; i < gridSize; i++) {
+        if(board[row][i] === num) {
+            return false;
+        }
+    }
+    for(let i = 0; i < gridSize; i++) {
+        if(board[i][col] === num) {
+            return false;
+        }
+    }
+    let boxStartRow = row - row%3;
+    let boxStartCol = col - col%3;
+    for(let r = 0; r < 3; r++) {
+        for(let c = 0; c < 3; c++) {
+            if(board[boxStartRow + r][boxStartCol + c] === num) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
-initBoards();
+function getBestEmptyCell(board) {
+    let bestChoice = null;
+    let minChoice = 10;
+    for(let r = 0; r < gridSize; r++) {
+        for(let c = 0; c < gridSize; c++) {
+            if(board[r][c] == 0) {
+                let choices = 0;
+                for(let num = 1; num <= 9; num++) {
+                    if(isNumberValid(board, r, c, num)) choices++;
+                }
+                if(choices < minChoice) {
+                    minChoice = choices;
+                    bestChoice = [r, c];
+                }
+                if(choices == 1) {
+                    return [r, c];
+                }
+            }
+        }
+    }
+    return bestChoice;
+}
+
+function solveSudoku() {
+    let emptyCell = getBestEmptyCell(puzzleBoard);
+    if(emptyCell === null) {
+        return true;
+    }
+    let row = emptyCell[0];
+    let col = emptyCell[1];
+    for(let num = 1; num <= 9; num++) {
+        if(isNumberValid(puzzleBoard, row, col, num)) {
+            puzzleBoard[row][col] = num;
+            if(solveSudoku()) {
+                return true;
+            }
+            puzzleBoard[row][col] = 0;
+        }
+    }
+    return false;
+}
+
+function clickSolveButton() {
+    readGridFromScreen();
+    let boardIsGood = true;
+    for(let r = 0; r < gridSize; r++) {
+        for(let c = 0; c < gridSize; c++) {
+            let num = puzzleBoard[r][c];
+            if(num !== 0) {
+                puzzleBoard[r][c] = 0;
+                if(!isNumberValid(puzzleBoard, r, c, num)) {
+                    boardIsGood = false;
+                }
+                puzzleBoard[r][c] = num;
+            }
+        }
+    }
+    if(!boardIsGood) {
+        showMessage('Current board has mistakes. Cannot solve.', 'error');
+        return;
+    }
+    if(solveSudoku()) {
+        showGrid();
+        showMessage('Puzzle solved!', 'success');
+    }
+    else {
+        showMessage('No solution exists for this puzzle.', 'error');
+    }
+}
+
+function clickValidateButton() {
+    readGridFromScreen();
+    let emptyCell = getBestEmptyCell(puzzleBoard);
+    if(emptyCell !== null) {
+        showMessage('Board is not complete!', 'info');
+        return ;
+    }
+    let boardIsCorrect = true;
+    for(let r = 0; r < gridSize; r++) {
+        for(let c = 0; c < gridSize; c++) {
+            let num = puzzleBoard[r][c];
+            puzzleBoard[r][c] = 0;
+            if(!isNumberValid(puzzleBoard, r, c, num)) {
+                boardIsCorrect = false;
+            }
+            puzzleBoard[r][c] = num;
+        }
+    }
+    if(boardIsCorrect) {
+        showMessage('Congratulations! The solution is valid.', 'success');
+    }
+    else {
+        showMessage('Solution is not valid.', 'error');
+    }
+}
+
+getPuzzleBtn.addEventListener('click', function() {
+    getPuzzle();
+});
+
+solvePuzzleBtn.addEventListener('click', function() {
+    clickSolveButton();
+});
+
+validateBtn.addEventListener('click', function() {
+    clickValidateButton();
+});
+
+clearBtn.addEventListener('click', function() {
+    clearBoard();
+});
+
+gridContainer.addEventListener('keydown', function(e) {
+    let cell = e.target;
+    if(!cell.classList.contains('cell')) {
+        return;
+    }
+    let isNumber = e.key >= '1' && e.key <= '9';
+    let isBackspace = e.key === 'Backspace';
+    let isDelete = e.key === 'Delete';
+    if(!isNumber && !isBackspace && !isDelete) {
+        e.preventDefault();
+    }
+});
+
+gridContainer.addEventListener('input', function(e) {
+    let cell = e.target;
+    if(!cell.classList.contains('cell')) {
+        return;
+    }
+    if(cell.textContent.length > 1) {
+        cell.textContent = cell.textContent.slice(0, 1);
+    }
+});
+
 makeGrid();
 showGrid();
