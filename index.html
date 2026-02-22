@@ -13,21 +13,24 @@
             <h1>Sudoku Solver</h1>
             <p class="subtitle">Get a puzzle, solve it yourself or solve automatically.</p>
         </header>
-
         <main>
             <div id="sudoku-grid" class="sudoku-grid"></div>
-
             <div class="button-grid">
                 <button id="get-puzzle-btn">Get Puzzle</button>
                 <button id="solve-puzzle-btn">Solve It</button>
                 <button id="validate-btn">Validate</button>
                 <button id="clear-btn">Clear</button>
             </div>
-            
             <div id="message-box"></div>
         </main>
     </div>
 
+    <div id="loader-overlay" class="loader-overlay">
+        <div class="loader-box">
+            <div class="spinner"></div>
+            <p id="loader-text">Fetching Sudoku...</p>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
