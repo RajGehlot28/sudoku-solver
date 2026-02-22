@@ -2,35 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sudoku Solver</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Sudoku Solver</h1>
-            <p class="subtitle">Get a puzzle, solve it yourself or solve automatically.</p>
-        </header>
-        <main>
-            <div id="sudoku-grid" class="sudoku-grid"></div>
-            <div class="button-grid">
-                <button id="get-puzzle-btn">Get Puzzle</button>
-                <button id="solve-puzzle-btn">Solve It</button>
-                <button id="validate-btn">Validate</button>
-                <button id="clear-btn">Clear</button>
-            </div>
-            <div id="message-box"></div>
-        </main>
-    </div>
+<div class="container">
+    <header>
+        <h1>Sudoku Solver</h1>
+        <p class="subtitle">Get a puzzle, solve it yourself or solve automatically.</p>
+    </header>
 
-    <div id="loader-overlay" class="loader-overlay">
-        <div class="loader-box">
-            <div class="spinner"></div>
-            <p id="loader-text">Fetching Sudoku...</p>
+    <main>
+        <div id="sudoku-grid" class="sudoku-grid"></div>
+        <div class="button-grid">
+            <button id="get-puzzle-btn">Get Puzzle</button>
+            <button id="solve-puzzle-btn">Solve It</button>
+            <button id="validate-btn">Validate</button>
+            <button id="clear-btn">Clear</button>
         </div>
+        <div id="message-box"></div>
+    </main>
+</div>
+
+<div id="loader-overlay" class="loader-overlay">
+    <div class="loader-box">
+        <div class="spinner"></div>
+        <p id="loader-text">Fetching Sudoku...</p>
     </div>
-    <script src="script.js"></script>
+</div>
+<script src="script.js"></script>
 </body>
 </html>
